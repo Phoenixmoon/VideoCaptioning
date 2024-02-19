@@ -1,0 +1,6 @@
+pydub~=0.25.1
+SpeechRecognition
+openai-whisper
+opencv-python
+soundfile
+
