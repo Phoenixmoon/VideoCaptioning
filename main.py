@@ -1,21 +1,12 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
-
 import os
-os.environ["PATH"] += os.pathsep + '/opt/homebrew/bin'
 from pydub import AudioSegment
 from pathlib import Path
-
 import speech_recognition as sr
 import time
-
 import cv2
-
 import json
-
-# import pandas as pd
+import pandas as pd
+os.environ["PATH"] += os.pathsep + '/opt/homebrew/bin'
 
 
 def wrap_text(text, width):
@@ -36,7 +27,7 @@ def wrap_text(text, width):
     return wrapped_lines
 
 
-def display_text_with_wrapping(frame, text, x, y, font_scale, color, thickness, width, h_padding = 1.7):
+def display_text_with_wrapping(frame, text, x, y, font_scale, color, thickness, width, h_padding=1.7):
     lines = wrap_text(text, width)
     y_offset = 0
 
@@ -51,7 +42,7 @@ def display_text_with_wrapping(frame, text, x, y, font_scale, color, thickness, 
 
 def video_caption(video_path, start_time=0, end_time=30):
     mp3_path = video_path.replace('.mp4', '.mp3')
-    audio = AudioSegment.from_file(video_path) # convert to mp3
+    audio = AudioSegment.from_file(video_path)  # convert to mp3
     audio.export(mp3_path, format='mp3')
 
     output_wav_path = Path(mp3_path).with_suffix(".wav")
@@ -91,14 +82,14 @@ def video_caption(video_path, start_time=0, end_time=30):
         'text': [segment['text'] for segment in result['segments']]
     }
 
-    # df = pd.DataFrame(data)
+    df = pd.DataFrame(data)
     with open(video_path.replace('.mp4', ' transcript.json'), "w") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
-    # result_csv_path = video_path.replace('.mp4', ' transcript.csv')
-    # df.to_csv(result_csv_path, index=False)
+    result_csv_path = video_path.replace('.mp4', ' transcript.csv')
+    df.to_csv(result_csv_path, index=False)
 
-    # VideoWriter object?
+    # VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'H264')  # Codec for MP4 file
     output_video = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
 
@@ -117,7 +108,6 @@ def video_caption(video_path, start_time=0, end_time=30):
             end_frame = int(end_time * fps)
             if start_frame <= current_frame <= end_frame:
                 caption = segment["text"]
-                print(f"Found caption for frame {current_frame}: {caption}")
                 break
 
         if caption is not None:
@@ -125,13 +115,14 @@ def video_caption(video_path, start_time=0, end_time=30):
                                                 width=frame.shape[1] - 100, h_padding=1.6)
             frame_with_wrapped = display_text_with_wrapping(frame, caption, x=50, y=50, font_scale=1, color=(255, 255, 255),
                                                             thickness=2, width=frame.shape[1] - 100)
-
+            cv2.imwrite('test_image.jpg', frame_with_wrapped)
+            cv2.imwrite('test_image.jpg', shadow)
 
         output_video.write(frame)
-  # release the cap object
+    # release the cap object
     cap.release()
     output_video.release()
-  # close all windows
+    # close all windows
     cv2.destroyAllWindows()
 
     # get audio
@@ -145,7 +136,3 @@ if __name__ == '__main__':
     t0 = time.time()
     video_caption('Data (for testing)/Tim Urban_ Inside the mind of a master procrastinator _ TED trimmed.mp4')
     print(f'Time used (seconds): {round(time.time() - t0, 2)}')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
-
